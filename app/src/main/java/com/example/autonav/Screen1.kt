@@ -86,7 +86,7 @@ fun Screen1(navController: NavController) {
             )
             Spacer(modifier = Modifier.height(5.dp))
             Text(
-                text = "Your Guide to Festivals and More",
+                text = "Fest & Flicks",
                 style = MaterialTheme.typography.labelMedium.copy(
                     fontSize = 20.sp,
                     color = Color.Gray
