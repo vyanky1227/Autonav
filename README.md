@@ -1,4 +1,4 @@
-# AutoNav: Find Your Way with Ease
+# AutoNav: Fest & Flicks
 
 AutoNav is a user-friendly navigation app that helps users find their way easily. This project utilizes Retrofit, Coroutines, Jetpack Compose, Material3 libraries, and Geocoder for fetching the user's location.
 
