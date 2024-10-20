@@ -115,11 +115,18 @@ dependencies {
     implementation ("androidx.core:core:1.7.0")
     implementation ("com.squareup.retrofit2:retrofit:2.11.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.11.0")
-
-
-
-
-
-
+    implementation ("androidx.compose.material3:material3:1.1.0")// Ensure you have this line
+    implementation ("androidx.compose.material3:material3-window-size-class:1.1.0") // Optional for window size class
+    implementation ("org.jsoup:jsoup:1.14.3") // Check for the latest version
+    implementation ("org.jsoup:jsoup:1.15.2")
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation ("com.squareup.okhttp3:logging-interceptor:4.9.0")
 
 }
+
+
+
+
+
+

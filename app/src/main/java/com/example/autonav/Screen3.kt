@@ -7,10 +7,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Geocoder
+import android.net.Uri
 import android.os.Bundle
 import android.speech.RecognizerIntent
+import android.util.Log
 import android.widget.Toast
-import android.widget.Toast.*
+import android.widget.Toast.LENGTH_SHORT
+import android.widget.Toast.makeText
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -37,13 +40,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -56,6 +63,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -92,6 +100,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.util.Locale
+
 
 class MainActivity3 : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -261,6 +270,7 @@ fun Screen3(navController: NavController) {
                 }
                 Spacer(modifier = Modifier.height(8.dp))
 
+
                 OutlinedTextField(
                     value = text,
                     onValueChange = { newText -> text = newText },
@@ -366,7 +376,7 @@ fun Screen3(navController: NavController) {
                                     contentDescription = "Image ",
                                     modifier = Modifier
                                         .fillMaxSize()
-                                        .clip(RoundedCornerShape(16.dp)),
+                                        .clip(RoundedCornerShape(15.dp)),
                                     contentScale = ContentScale.Crop
                                 )
 
@@ -419,9 +429,10 @@ fun Screen3(navController: NavController) {
                                     contentDescription = "Image 4",
                                     modifier = Modifier
                                         .fillMaxSize()
-                                        .clip(RoundedCornerShape(16.dp)),
+                                        .clip(RoundedCornerShape(15.dp)),
                                     contentScale = ContentScale.Crop
                                 )
+
 
                                 // Button aligned at the top start
                                 Button(
@@ -462,7 +473,22 @@ fun Screen3(navController: NavController) {
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
+                val iconList = listOf(
+                    Icons.Default.Favorite,
+                    Icons.Default.Home,
+                    Icons.Default.Settings,
+                    Icons.Default.Search,
+                    Icons.Default.Info
+                )
+
+                val listState = rememberLazyListState() // State for LazyRow scrolling
+                val coroutineScope = rememberCoroutineScope() // To launch scroll animation
+
+// State to manage the display of the dialog
+                var showDialog by remember { mutableStateOf(false) }
+
                 LazyRow(
+                    state = listState, // Attach the state to LazyRow
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
@@ -473,23 +499,57 @@ fun Screen3(navController: NavController) {
                                 .background(Color.White, RoundedCornerShape(16.dp))
                                 .border(1.dp, Color.Gray, RoundedCornerShape(16.dp))
                                 .padding(8.dp)
+                                .clickable {
+                                    if (index == 4) { // Check if the Info icon is clicked
+                                        // Show the dialog when the Info icon is clicked
+                                        showDialog = true
+                                    }
+
+                                    // Update selected category
+                                    selectedFavoriteCategory = if (selectedFavoriteCategory == index + 2) -1 else index + 2
+
+                                    // Trigger the sliding animation to the clicked item
+                                    coroutineScope.launch {
+                                        listState.animateScrollToItem(index)
+                                    }
+                                }
                         ) {
                             Icon(
-                                imageVector = Icons.Default.Favorite,
+                                imageVector = iconList[index], // Assign different icons from the list
                                 contentDescription = "Icon $index",
                                 modifier = Modifier
                                     .size(40.dp)
                                     .align(Alignment.Center),
-                                tint = if (selectedFavoriteCategory == index + 2) Color.Red else Color.White
+                                tint = if (selectedFavoriteCategory == index + 2) Color.Red else Color.Black // Set default to black, red when selected
                             )
-                            // Handle favorite icon click in categories
-                            Modifier.clickable {
-                                selectedFavoriteCategory = if (selectedFavoriteCategory == index + 2) -1 else index + 2
-                            }
                         }
                     }
                 }
+
                 Spacer(modifier = Modifier.height(16.dp))
+
+// AlertDialog to show the message
+                if (showDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showDialog = false },
+                        title = { Text(text = "App Information") },
+                        text = {
+                            Text(
+                                text = "This app was created by Vyankatesh Dharashivkar and Yash Bhagde. " +
+                                        "The purpose of this app is to assist users in navigating easily and efficiently."
+                            )
+                        },
+                        confirmButton = {
+                            Button(onClick = { showDialog = false }) {
+                                Text("OK")
+                            }
+                        }
+                    )
+                }
+
+
+
+
 
                 Text(
                     text = "Personalized Suggestions",
@@ -522,8 +582,11 @@ fun Screen3(navController: NavController) {
                                 .clip(RoundedCornerShape(16.dp)),
                             contentScale = ContentScale.Crop
                         )
+
                         Button(
-                            onClick = { /* Handle button click */ },
+                            onClick = {
+                                navController.navigate("screen4_festival") // Ensure this matches the route defined in your NavGraph
+                            },
                             modifier = Modifier
                                 .align(Alignment.TopStart)
                                 .padding(5.dp),
@@ -531,6 +594,10 @@ fun Screen3(navController: NavController) {
                         ) {
                             Text("Festival", color = Color.White)
                         }
+
+
+
+
                         Icon(
                             imageVector = Icons.Default.Favorite,
                             contentDescription = "Favorite Icon",
@@ -561,7 +628,22 @@ fun Screen3(navController: NavController) {
                             contentScale = ContentScale.Crop
                         )
                         Button(
-                            onClick = { /* Handle button click */ },
+                            onClick = {
+                                // Check if the BookMyShow app is installed
+                                val appIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.bookmyshow.com"))
+                                val packageManager = context.packageManager
+                                val appUri = Uri.parse("bookmyshow://") // URI scheme for the BookMyShow app
+
+                                // Try to open the app first
+                                val intent = Intent(Intent.ACTION_VIEW, appUri)
+                                if (intent.resolveActivity(packageManager) != null) {
+                                    // If the app is installed, launch it
+                                    context.startActivity(intent)
+                                } else {
+                                    // If the app is not installed, open the website in a browser
+                                    context.startActivity(appIntent)
+                                }
+                            },
                             modifier = Modifier
                                 .align(Alignment.TopStart)
                                 .padding(5.dp),
@@ -569,6 +651,8 @@ fun Screen3(navController: NavController) {
                         ) {
                             Text("Movies", color = Color.White)
                         }
+
+
                         Icon(
                             imageVector = Icons.Default.Favorite,
                             contentDescription = "Favorite Icon",
@@ -588,8 +672,16 @@ fun Screen3(navController: NavController) {
     }
 }
 
-
-
+fun openGoogleMaps(context: Context, location: String) {
+    val uri = Uri.parse("geo:0,0?q=$location") // Create a geo URI with the location
+    val intent = Intent(Intent.ACTION_VIEW, uri)
+    intent.setPackage("com.google.android.apps.maps") // Set the package to Google Maps
+    if (intent.resolveActivity(context.packageManager) != null) {
+        context.startActivity(intent) // Start the Maps activity
+    } else {
+        Toast.makeText(context, "Google Maps not installed", Toast.LENGTH_SHORT).show()
+    }
+}
 
 
 @SuppressLint("MissingPermission")
