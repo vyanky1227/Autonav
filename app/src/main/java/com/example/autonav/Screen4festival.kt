@@ -1,5 +1,7 @@
 package com.example.autonav
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -7,21 +9,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
-import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.delay
 
-
 @Composable
-
 fun Screen4Festival(navController: NavController) {
     // Simulate loading state
     var isLoading by remember { mutableStateOf(true) }
@@ -49,28 +43,33 @@ fun Screen4Festival(navController: NavController) {
             // Show shimmering effect while loading
             ShimmerEffect()
         } else {
-            // Show actual festivals
-            val festivals = listOf(
-                "03/10/24 - Sharad Navraatri, Ghatasthapanaa",
-                "11/10/24 - Durga Maha Naavami Puja, Durga Puja Ashtaami",
-                "12/10/24 - Dussehra, Sharaad Navraatri Paraana",
-                "13/10/24 - Durga Visarjaan",
-                "20/10/24 - Sankashti Chaaturthi, Kaarva Chaauth",
-                "28/10/24 - Rama Ekadaashi",
-                "29/10/24 - Dhanteras, Pradosh Vraat (K)",
-                "30/10/24 - Masik Shivaraatri",
-                "31/10/24 - Narak Chaturdaashi",
-                "01/11/24 - Diwali, Kaartik Amavasya",
-                "02/11/24 - Govardhan Pujaa",
-                "03/11/24 - Bhaii Dooj",
-                "07/11/24 - Chhath Puja"
+            // Map of festivals and their corresponding Wikipedia URLs
+            val festivalUrls = mapOf(
+                "03/10/24 - Sharad Navraatri, Ghatasthapanaa" to "https://en.wikipedia.org/wiki/Navaratri",
+                "11/10/24 - Durga Maha Naavami Puja, Durga Puja Ashtaami" to "https://en.wikipedia.org/wiki/Durga_Puja",
+                "12/10/24 - Dussehra, Sharaad Navraatri Paraana" to "https://en.wikipedia.org/wiki/Dussehra",
+                "13/10/24 - Durga Visarjaan" to "https://en.wikipedia.org/wiki/Durga_Visarjan",
+                "20/10/24 - Sankashti Chaaturthi, Kaarva Chaauth" to "https://en.wikipedia.org/wiki/Sankashti_Chaturthi",
+                "28/10/24 - Rama Ekadaashi" to "https://en.wikipedia.org/wiki/Rama_Ekadashi",
+                "29/10/24 - Dhanteras, Pradosh Vraat (K)" to "https://en.wikipedia.org/wiki/Dhanteras",
+                "30/10/24 - Masik Shivaraatri" to "https://en.wikipedia.org/wiki/Masik_Shivaratri",
+                "31/10/24 - Narak Chaturdaashi" to "https://en.wikipedia.org/wiki/Naraka_Chaturdashi",
+                "01/11/24 - Diwali, Kaartik Amavasya" to "https://en.wikipedia.org/wiki/Diwali",
+                "02/11/24 - Govardhan Pujaa" to "https://en.wikipedia.org/wiki/Govardhan_Puja",
+                "03/11/24 - Bhaii Dooj" to "https://en.wikipedia.org/wiki/Bhaiya_Dooj",
+                "07/11/24 - Chhath Puja" to "https://en.wikipedia.org/wiki/Chhath"
             )
 
             LazyColumn {
-                items(festivals) { festival ->
+                items(festivalUrls.keys.toList()) { festival ->
                     FestivalItem(festival = festival) {
-                        // Handle explore button click
-                        // You can add navigation logic if needed
+                        // Get the corresponding URL for the clicked festival
+                        val url = festivalUrls[festival]
+                        // Launch the browser intent
+                        url?.let {
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(it))
+                            navController.context.startActivity(intent)
+                        }
                     }
                 }
             }
@@ -136,5 +135,3 @@ fun FestivalItem(festival: String, onExploreClick: () -> Unit) {
         }
     }
 }
-
-
